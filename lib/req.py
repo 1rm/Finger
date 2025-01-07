@@ -29,7 +29,7 @@ class Request:
     def apply(self, url):
         try:
             #proxies = { "http": "127.0.0.1:8080","https": "127.0.0.1:8080"}
-            with requests.get(url, timeout=10, headers=self.get_headers(), cookies=self.get_cookies(), verify=False,
+            with requests.get(url, timeout=20, headers=self.get_headers(), cookies=self.get_cookies(), verify=False,
                               allow_redirects=True, stream=True) as response:
                 if int(response.headers.get("content-length", default=1000)) > 100000:
                     self.response(url, response, True)
@@ -52,9 +52,8 @@ class Request:
             html = ""
             size = response.headers.get("content-length", default=1000)
         else:
-            response.encoding = response.apparent_encoding if response.encoding == 'ISO-8859-1' else response.encoding
-            response.encoding = "utf-8" if response.encoding is None else response.encoding
-            html = response.content.decode(response.encoding,"ignore")
+            response.encoding = response.apparent_encoding
+            html = response.text 
             size = len(response.text)
         title = self.get_title(html).strip().replace('\r', '').replace('\n', '')
         status = response.status_code
